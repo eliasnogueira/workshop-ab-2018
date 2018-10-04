@@ -43,7 +43,7 @@ public class RemoverPessoaTest extends BaseTest {
         driver.findElement(By.id("android:id/search_src_text")).sendKeys("Carlos");
 
         // retorna o elemento contendo o nome da pessoa
-        MobileElement item = driver.findElement(By.id("android:id/text1"));
+        MobileElement item = (MobileElement) driver.findElement(By.id("android:id/text1"));
 
         // aplica um "pressionar longo" no elelemento da pessoa
         TouchAction touch = new TouchAction(driver);

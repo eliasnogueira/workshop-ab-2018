@@ -25,7 +25,9 @@
 package web;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.*;
@@ -34,6 +36,8 @@ public class CadastrarPessoaTest extends BaseTest {
 
     @Test
     public void cadastroComSucesso() {
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+
         By addButton  = By.id("add");
         wait.until(ExpectedConditions.presenceOfElementLocated(addButton));
         driver.findElement(addButton).click();
@@ -42,9 +46,10 @@ public class CadastrarPessoaTest extends BaseTest {
         driver.findElement(By.id("name")).sendKeys("Daenerys Targaryen");
         driver.findElement(By.name("address")).sendKeys("Dragonstone");
         driver.findElement(By.cssSelector("input[ng-model='post.hobbies']")).sendKeys("Break Chains");
-        driver.findElement(By.cssSelector(".w3-btn.w3-teal")).click();
+        new Actions(driver).click(driver.findElement(By.cssSelector(".w3-btn.w3-teal"))).build().perform();;
+        //driver.findElement(By.cssSelector(".w3-btn.w3-teal")).click();
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("address")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("edit")));
         String dadosPagina = driver.getPageSource();
 
         assertThat(dadosPagina.contains("Daenerys Targaryen"));

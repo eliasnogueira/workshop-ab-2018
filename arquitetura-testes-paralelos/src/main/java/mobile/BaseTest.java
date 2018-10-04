@@ -24,53 +24,79 @@
 package mobile;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
+import io.appium.java_client.remote.IOSMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.*;
 import utils.enums.Camada;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import static utils.Utils.lerPropriedade;
 
 public class BaseTest {
 
-    AppiumDriver<MobileElement> driver;
-    WebDriverWait wait;
+    AppiumDriver<?> driver = null;
+    WebDriverWait wait = null;
 
-    @BeforeMethod
-    public void preCondicao() throws MalformedURLException {
-        File app = new File("app/workshop.apk");
-
+    @BeforeTest(alwaysRun = true)
+    @Parameters( { "plataforma", "udid", "versaoPlataforma"})
+    public void beforeTest(String platform, String udid, String platformVersion) throws Exception {
         DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-        capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android Emulator");
 
-        /*
-         * Se a propriedade do arquivo mobile.propetties estiver como true instala/reinstala a app
-         * Senão usa a app já instalada
-         */
-        if (Boolean.parseBoolean(lerPropriedade("app.instalada", Camada.MOBILE))) {
-            capabilities.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
-        } else {
-            capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, "com.eliasnogueira.workshop");
-            capabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, "activities.ListActivity");
+        capabilities.setCapability(MobileCapabilityType.UDID, udid);
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, platformVersion);
+
+        String completeURL = lerPropriedade("grid.url", Camada.MOBILE) + ":" + lerPropriedade("grid.porta", Camada.MOBILE) + "/wd/hub";
+
+        switch (platform.toLowerCase()) {
+            case "ios":
+                capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone Simulator");
+                capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
+
+                // if iOS 9+ use XCUITest
+                if (Boolean.parseBoolean(lerPropriedade("platform.ios.xcode8", Camada.MOBILE))) {
+                    capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
+                }
+
+                if (Boolean.parseBoolean(lerPropriedade("app.instalada", Camada.MOBILE))) {
+                    capabilities.setCapability(MobileCapabilityType.APP, new File(lerPropriedade("app.ios.path", Camada.MOBILE)).getAbsolutePath());
+                } else {
+                    capabilities.setCapability(IOSMobileCapabilityType.APP_NAME, lerPropriedade("app.ios.appName", Camada.MOBILE));
+                }
+
+                driver = new IOSDriver<>(new URL(completeURL), capabilities);
+                wait = new WebDriverWait(driver, 10);
+                break;
+
+            case "android":
+                capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android Emulator");
+                capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
+
+                if (Boolean.parseBoolean(lerPropriedade("app.instalada", Camada.MOBILE))) {
+                    capabilities.setCapability(MobileCapabilityType.APP, new File(lerPropriedade("app.android.path", Camada.MOBILE)).getAbsolutePath());
+                } else {
+                    capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, lerPropriedade("app.android.appPackage", Camada.MOBILE));
+                    capabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, lerPropriedade("app.android.appActivity", Camada.MOBILE));
+                }
+
+                driver = new AndroidDriver<>(new URL(completeURL), capabilities);
+                wait = new WebDriverWait(driver, 10);
+                break;
+
+            default:
+                throw new Exception("Plataforma não suportada");
         }
-
-        driver = new AndroidDriver<>(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
-        wait = new WebDriverWait(driver, 10);
     }
 
-    @AfterMethod
-    public void posCondicao() {
+    @AfterTest
+    public void tearDown() {
         driver.quit();
     }
 }

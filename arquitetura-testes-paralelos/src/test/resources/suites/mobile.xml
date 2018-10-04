@@ -1,0 +1,23 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Suite" parallel="tests" thread-count="3" >
+
+    <test name="Cadastrar pessoa">
+        <parameter name="plataforma" value="android"/>
+        <parameter name="udid" value="emulator-5554"/>
+        <parameter name="versaoPlataforma" value="8.0"/>
+        <classes>
+            <class name="mobile.CadastrarPessoaTest"/>
+        </classes>
+    </test>
+
+    <test name="Remover pessoa">
+        <parameter name="plataforma" value="android"/>
+        <parameter name="udid" value="emulator-5556"/>
+        <parameter name="versaoPlataforma" value="8.0"/>
+        <classes>
+            <class name="mobile.RemoverPessoaTest"/>
+        </classes>
+    </test>
+
+</suite>

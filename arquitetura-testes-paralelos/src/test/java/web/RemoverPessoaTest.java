@@ -27,6 +27,7 @@ package web;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.*;
@@ -35,8 +36,10 @@ public class RemoverPessoaTest extends BaseTest {
 
     @Test
     public void removerPessoaExistente() {
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("search")));
-        driver.findElement(By.id("search")).sendKeys("Daenerys");
+        driver.findElement(By.id("search")).sendKeys("Maria");
 
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("remove")));
 
@@ -50,6 +53,6 @@ public class RemoverPessoaTest extends BaseTest {
         driver.findElement(By.id("search")).clear();
 
         String pageContent = driver.getPageSource();
-        assertThat(pageContent.contains("Daenerys"));
+        assertThat(pageContent.contains("João"));
     }
 }

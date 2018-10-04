@@ -24,33 +24,23 @@
 
 package web;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.*;
+import utils.enums.Camada;
+import web.driver.DriverFactory;
+
+import static utils.Utils.*;
 
 public class BaseTest {
 
     WebDriver driver;
-    WebDriverWait wait;
-
-    /*
-     * Temporario e somente para execucao local
-     */
-    @BeforeClass
-    public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
-    }
 
     @BeforeMethod
-    public void preCondicao() {
-        driver = new ChromeDriver();
-        wait = new WebDriverWait(driver, 10);
+    @Parameters("browser")
+    public void preCondicao(@Optional("chrome") String browser) {
+        driver = DriverFactory.criarInstancia(browser);
 
-        driver.get("http://localhost:3000");
+        driver.get(lerPropriedade("url.inicial", Camada.WEB));
     }
 
     @AfterMethod
