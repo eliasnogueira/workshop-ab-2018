@@ -60,3 +60,7 @@ $('#check_docker').click(function () {
 $('#check_containers').click(function () {
     this.checked === true ? $('#containers').addClass(greenItem) : $('#containers').removeClass(greenItem);
 });
+
+$('#check_projeto').click(function () {
+    this.checked === true ? $('#projeto').addClass(greenItem) : $('#projeto').removeClass(greenItem);
+});
